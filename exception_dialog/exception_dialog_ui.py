@@ -3,11 +3,9 @@ import sys
 from . import ui_utils
 from .ui_utils import QtWidgets, QtGui
 
-existing_app = QtWidgets.QApplication.instance()
-
 # if running in standalone, create app
 standalone_app = None
-if not existing_app:
+if not QtWidgets.QApplication.instance():
     standalone_app = QtWidgets.QApplication(sys.argv)
 
 
