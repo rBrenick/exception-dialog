@@ -37,8 +37,15 @@ def exception_triggered(exc_type=None, exc_value=None, exc_trace=None, *args, **
     win.add_exception_text("".join(exception_text))
 
     # call original exception hook
-    if hook_cls.previous_except_hook is not None:
+    if hook_cls.previous_except_hook:
         hook_cls.previous_except_hook(exc_type, exc_value, exc_trace)
+
+
+def dcc_exception_triggered(*args, **kwargs):
+    exception_triggered(*args, **kwargs)
+
+    if hook_cls.previous_dcc_except_hook:
+        hook_cls.previous_dcc_except_hook(*args, **kwargs)
 
 
 def register_exception_hook():
@@ -46,7 +53,7 @@ def register_exception_hook():
         return
 
     hook_cls.previous_except_hook = sys.excepthook
-    hook_cls.previous_dcc_except_hook = dcc.register_exception_hook(exception_triggered)
+    hook_cls.previous_dcc_except_hook = dcc.register_exception_hook(dcc_exception_triggered)
     sys.excepthook = exception_triggered
     print("Registered Exception hook: {} - {}".format(__file__, exception_triggered.__name__))
 
