@@ -1,5 +1,5 @@
 # exception-dialog
-Template for a basic Qt tool for DCCs
+Simple dialog that shows exceptions when they occur.
 
 ![tool header image](docs/header_image.png)
 
