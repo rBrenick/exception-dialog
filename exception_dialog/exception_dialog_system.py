@@ -46,6 +46,7 @@ class BaseExceptionAction(object):
     label = "[EXAMPLE]"
     icon_name = "slack_icon"
     is_automatic = False
+    show_button = True
 
     @staticmethod
     def trigger_action(exc_trace, exc_value, exc_typ):
@@ -63,11 +64,13 @@ class AutomaticExceptionAction(BaseExceptionAction):
 class SlackExceptionAction(BaseExceptionAction):
     label = "Get Help in Slack"
     icon_name = "slack_icon"
+    show_button = False
 
 
 class JiraExceptionAction(BaseExceptionAction):
     label = "Create Jira"
     icon_name = "jira_icon"
+    show_button = False
 
 
 def get_exception_action_classes():

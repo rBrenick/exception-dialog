@@ -29,6 +29,8 @@ class ExceptionDialogWindow(ui_utils.CoreToolWindow):
         for sub_cls in eds.get_exception_action_classes():  # type: eds.BaseExceptionAction
             if sub_cls.is_automatic:
                 continue
+            if not sub_cls.show_button:
+                continue
             self.add_action_button(
                 sub_cls.label,
                 icon=resources.get_image_path(sub_cls.icon_name),
