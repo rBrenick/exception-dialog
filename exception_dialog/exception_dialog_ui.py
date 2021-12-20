@@ -27,13 +27,24 @@ class ExceptionDialogWindow(ui_utils.CoreToolWindow):
         self.setWindowIcon(QtGui.QIcon(resources.get_image_path("warning_icon")))
 
         for sub_cls in eds.get_exception_action_classes():  # type: eds.BaseExceptionAction
+            if sub_cls.is_automatic:
+                continue
             self.add_action_button(
                 sub_cls.label,
                 icon=resources.get_image_path(sub_cls.icon_name),
                 command=partial(self.trigger_exception_class, sub_cls),
             )
 
-        self.add_action_button("Close", icon=resources.get_image_path("close_icon"), command=self.hide)
+        self.add_action_button(
+            "Copy to Clipboard",
+            icon=resources.get_image_path("copy_icon"),
+            command=self.copy_exception_to_clipboard,
+        )
+        self.add_action_button(
+            "Close",
+            icon=resources.get_image_path("close_icon"),
+            command=self.hide,
+        )
 
     def add_action_button(self, label="[EXAMPLE]", icon=None, command=None):
         btn = QtWidgets.QPushButton(label)
@@ -62,6 +73,13 @@ class ExceptionDialogWindow(ui_utils.CoreToolWindow):
         self.ui.exception_text_edit.moveCursor(QtGui.QTextCursor.End)
         self.ui.exception_text_edit.insertPlainText(exc_text)
         self.ui.exception_text_edit.moveCursor(QtGui.QTextCursor.End)
+
+    def copy_exception_to_clipboard(self):
+        clipboard = QtWidgets.QApplication.clipboard()  # type: QtGui.QClipboard
+        clipboard.setText(self.ui.exception_text_edit.toPlainText())
+
+        # select text to indicate something happened
+        self.ui.exception_text_edit.selectAll()
 
 
 class ExceptionDialogUI(QtWidgets.QWidget):

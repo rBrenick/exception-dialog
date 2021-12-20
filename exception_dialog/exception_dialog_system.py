@@ -33,6 +33,10 @@ def exception_triggered(exc_type=None, exc_value=None, exc_trace=None, *args, **
 
     win.set_latest_exception(exc_type, exc_value, exc_trace)
 
+    for action_cls in get_exception_action_classes():
+        if action_cls.is_automatic:
+            action_cls.trigger_action(exc_type, exc_value, exc_trace)
+
     # call original exception hook
     if hook_cls.previous_except_hook:
         hook_cls.previous_except_hook(exc_type, exc_value, exc_trace)
@@ -41,10 +45,19 @@ def exception_triggered(exc_type=None, exc_value=None, exc_trace=None, *args, **
 class BaseExceptionAction(object):
     label = "[EXAMPLE]"
     icon_name = "slack_icon"
+    is_automatic = False
 
     @staticmethod
     def trigger_action(exc_trace, exc_value, exc_typ):
         logging.warning("trigger_action needs implementation for this class")
+
+
+class AutomaticExceptionAction(BaseExceptionAction):
+    is_automatic = True
+
+    @staticmethod
+    def trigger_action(exc_trace, exc_value, exc_typ):
+        pass
 
 
 class SlackExceptionAction(BaseExceptionAction):
