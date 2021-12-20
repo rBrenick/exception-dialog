@@ -1,6 +1,6 @@
+import logging
 import os
 import sys
-import traceback
 
 active_dcc_is_maya = "maya" in os.path.basename(sys.executable)
 
@@ -31,14 +31,34 @@ def exception_triggered(exc_type=None, exc_value=None, exc_trace=None, *args, **
         win = exception_dialog_ui.main()  # type: exception_dialog_ui.ExceptionDialogWindow
         hook_cls.dialog_instance = win
 
-    exception_text = traceback.format_exception(exc_type, exc_value, exc_trace)
-    exception_text.append("-" * 50)
-    exception_text.append("\n")
-    win.add_exception_text("".join(exception_text))
+    win.set_latest_exception(exc_type, exc_value, exc_trace)
 
     # call original exception hook
     if hook_cls.previous_except_hook:
         hook_cls.previous_except_hook(exc_type, exc_value, exc_trace)
+
+
+class BaseExceptionAction(object):
+    label = "[EXAMPLE]"
+    icon_name = "slack_icon"
+
+    @staticmethod
+    def trigger_action(exc_trace, exc_value, exc_typ):
+        logging.warning("trigger_action needs implementation for this class")
+
+
+class SlackExceptionAction(BaseExceptionAction):
+    label = "Get Help in Slack"
+    icon_name = "slack_icon"
+
+
+class JiraExceptionAction(BaseExceptionAction):
+    label = "Create Jira"
+    icon_name = "jira_icon"
+
+
+def get_exception_action_classes():
+    return BaseExceptionAction.__subclasses__()
 
 
 def dcc_exception_triggered(*args, **kwargs):
