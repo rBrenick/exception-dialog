@@ -9,19 +9,27 @@ from shiboken2 import wrapInstance
 if sys.version_info.major >= 3:
     long = int
 
-active_dcc_is_maya = "maya" in os.path.basename(sys.executable)
+active_dcc_is_maya = "maya" in os.path.basename(sys.executable).lower()
+active_dcc_is_houdini = "houdini" in os.path.basename(sys.executable).lower()
+
+standalone_app_window = None
 
 resources_folder = os.path.join(os.path.dirname(os.path.dirname(__file__)), "resources")
 
 
 def get_app_window():
-    app_window = None
+    top_window = standalone_app_window
+
     if active_dcc_is_maya:
         from maya import OpenMayaUI as omui
         maya_main_window_ptr = omui.MQtUtil().mainWindow()
-        app_window = wrapInstance(long(maya_main_window_ptr), QtWidgets.QMainWindow)
+        top_window = wrapInstance(long(maya_main_window_ptr), QtWidgets.QMainWindow)
 
-    return app_window
+    elif active_dcc_is_houdini:
+        import hou
+        top_window = hou.qt.mainWindow()
+
+    return top_window
 
 
 class CoreToolWindow(QtWidgets.QMainWindow):

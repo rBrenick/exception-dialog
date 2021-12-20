@@ -117,6 +117,7 @@ def main(refresh=False):
     win.main(refresh=refresh)
 
     if standalone_app:
+        ui_utils.standalone_app_window = win
         sys.exit(standalone_app.exec_())
 
     return win
