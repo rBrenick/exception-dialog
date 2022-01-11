@@ -45,8 +45,21 @@ class ExceptionDialogWindow(ui_utils.CoreToolWindow):
         self.add_action_button(
             "Close",
             icon=resources.get_image_path("close_icon"),
-            command=self.hide,
+            command=self.close,
         )
+
+        menu_bar = QtWidgets.QMenuBar()
+
+        file_menu = menu_bar.addMenu("File")  # type: QtWidgets.QMenu
+
+        file_menu.addAction(
+            QtGui.QIcon(resources.get_image_path("close_icon")),
+            "Exit",
+            self.close,
+            QtGui.QKeySequence("ESC")
+        )
+
+        self.setMenuBar(menu_bar)
 
     def add_action_button(self, label="[EXAMPLE]", icon=None, command=None):
         btn = QtWidgets.QPushButton(label)
