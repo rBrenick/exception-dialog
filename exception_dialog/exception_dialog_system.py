@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import time
 
 active_dcc_is_maya = "maya" in os.path.basename(sys.executable)
 
@@ -8,6 +9,11 @@ if active_dcc_is_maya:
     from . import exception_dialog_dcc_maya as dcc_module
 
     dcc = dcc_module.ExceptionDialogMaya()
+
+
+class SessionInfo:
+    disable_until_this_time = None
+    disabled_for_this_session = False
 
 
 class ExceptionHookHandler(object):
@@ -21,17 +27,25 @@ hook_cls = ExceptionHookHandler()
 
 
 def exception_triggered(exc_type=None, exc_value=None, exc_trace=None, *args, **kwargs):
+    show_dialog = True
+    if SessionInfo.disabled_for_this_session:
+        show_dialog = False
+
+    if SessionInfo.disable_until_this_time and time.time() < SessionInfo.disable_until_this_time:
+        show_dialog = False
+
     if not any([exc_trace, exc_value, exc_type]):
         exc_type, exc_value, exc_trace = sys.exc_info()
 
-    win = hook_cls.dialog_instance
-    if win is None or not win.isVisible():
-        from . import exception_dialog_ui
+    if show_dialog:
+        win = hook_cls.dialog_instance
+        if win is None or not win.isVisible():
+            from . import exception_dialog_ui
 
-        win = exception_dialog_ui.main()  # type: exception_dialog_ui.ExceptionDialogWindow
-        hook_cls.dialog_instance = win
+            win = exception_dialog_ui.main()  # type: exception_dialog_ui.ExceptionDialogWindow
+            hook_cls.dialog_instance = win
 
-    win.set_latest_exception(exc_type, exc_value, exc_trace)
+        win.set_latest_exception(exc_type, exc_value, exc_trace)
 
     for action_cls in get_exception_action_classes():
         if action_cls.is_automatic:

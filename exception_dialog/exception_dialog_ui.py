@@ -1,5 +1,6 @@
 import sys
 import traceback
+import time
 from functools import partial
 
 from . import exception_dialog_system as eds
@@ -59,6 +60,20 @@ class ExceptionDialogWindow(ui_utils.CoreToolWindow):
             QtGui.QKeySequence("ESC")
         )
 
+        disable_dialog_menu = menu_bar.addMenu("Disable Dialog")  # type: QtWidgets.QMenu
+
+        disable_dialog_menu.addAction(
+            QtGui.QIcon(resources.get_image_path("clock_icon")),
+            "Disable Dialog - 1 Hour",
+            partial(self.disable_dialog, 3600),  # time in seconds
+        )
+
+        disable_dialog_menu.addAction(
+            QtGui.QIcon(resources.get_image_path("clock_icon")),
+            "Disable Dialog - This Session",
+            partial(self.disable_dialog, "session")
+        )
+
         self.setMenuBar(menu_bar)
 
     def add_action_button(self, label="[EXAMPLE]", icon=None, command=None):
@@ -95,6 +110,15 @@ class ExceptionDialogWindow(ui_utils.CoreToolWindow):
 
         # select text to indicate something happened
         self.ui.exception_text_edit.selectAll()
+
+    @staticmethod
+    def disable_dialog(disable_time_amount):
+        if disable_time_amount == "session":
+            eds.SessionInfo.disabled_for_this_session = True
+            return
+
+        if isinstance(disable_time_amount, int):
+            eds.SessionInfo.disable_until_this_time = time.time() + disable_time_amount
 
 
 class ExceptionDialogUI(QtWidgets.QWidget):
