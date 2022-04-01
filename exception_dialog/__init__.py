@@ -18,12 +18,10 @@ def reload_modules():
     reload(exception_dialog_dcc_core)
     reload(exception_dialog_system)
     reload(exception_dialog_ui)
+    exception_dialog_system.import_extensions(refresh=True)
     
 
 def startup():
     from . import exception_dialog_system
+    exception_dialog_system.import_extensions()
     exception_dialog_system.register_exception_hook()
-
-
-
-

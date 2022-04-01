@@ -1,7 +1,9 @@
+import importlib
 import logging
 import os
 import sys
 import time
+import traceback
 
 active_dcc_is_maya = "maya" in os.path.basename(sys.executable)
 
@@ -13,6 +15,10 @@ else:
     from . import exception_dialog_dcc_core as dcc_module
 
     dcc = dcc_module.ExceptionDialogCoreInterface()
+
+
+class ExceptionDialogConstants:
+    extension_file_prefix = "exception_dialog_ext"
 
 
 class SessionInfo:
@@ -28,6 +34,7 @@ class ExceptionHookHandler(object):
 
 
 hook_cls = ExceptionHookHandler()
+lk = ExceptionDialogConstants
 
 
 def exception_triggered(exc_type=None, exc_value=None, exc_trace=None, *args, **kwargs):
@@ -130,3 +137,36 @@ def unregister_exception_hook():
 
 def test_exception():
     blargh
+
+
+def import_extensions(refresh=False):
+    if refresh:
+        for mod_key in sys.modules.keys():
+            if mod_key.startswith(lk.extension_file_prefix):
+                sys.modules.pop(mod_key)
+
+    # look through sys.path for extension modules
+    modules_to_import = list()
+    for sys_path in sys.path:
+        if not os.path.isdir(sys_path):
+            continue
+
+        # for every .py file with the proper prefix, import it
+        for sys_path_name in os.listdir(sys_path):
+            if not sys_path_name.startswith(lk.extension_file_prefix):
+                continue
+
+            module_name = os.path.splitext(sys_path_name)[0]
+            modules_to_import.append(module_name)
+
+    modules_to_import = list(set(modules_to_import))
+
+    for module_import_str in modules_to_import:
+        if not module_import_str:
+            continue
+
+        try:
+            importlib.import_module(module_import_str)
+            print("Imported extension: {}".format(module_import_str))
+        except Exception as e:
+            traceback.print_exc()
