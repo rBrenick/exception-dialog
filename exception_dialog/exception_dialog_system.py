@@ -27,33 +27,27 @@ hook_cls = ExceptionHookHandler()
 
 
 def exception_triggered(exc_type=None, exc_value=None, exc_trace=None, *args, **kwargs):
-    show_dialog = True
     if SessionInfo.disabled_for_this_session:
-        show_dialog = False
+        return
 
     if SessionInfo.disable_until_this_time and time.time() < SessionInfo.disable_until_this_time:
-        show_dialog = False
+        return
 
     if not any([exc_trace, exc_value, exc_type]):
         exc_type, exc_value, exc_trace = sys.exc_info()
 
-    if show_dialog:
-        win = hook_cls.dialog_instance
-        if win is None or not win.isVisible():
-            from . import exception_dialog_ui
+    win = hook_cls.dialog_instance
+    if win is None or not win.isVisible():
+        from . import exception_dialog_ui
 
-            win = exception_dialog_ui.main()  # type: exception_dialog_ui.ExceptionDialogWindow
-            hook_cls.dialog_instance = win
+        win = exception_dialog_ui.main()  # type: exception_dialog_ui.ExceptionDialogWindow
+        hook_cls.dialog_instance = win
 
-        win.set_latest_exception(exc_type, exc_value, exc_trace)
+    win.set_latest_exception(exc_type, exc_value, exc_trace)
 
     for action_cls in get_exception_action_classes():
         if action_cls.is_automatic:
             action_cls.trigger_action(exc_type, exc_value, exc_trace)
-
-    # call original exception hook
-    if hook_cls.previous_except_hook:
-        hook_cls.previous_except_hook(exc_type, exc_value, exc_trace)
 
 
 class BaseExceptionAction(object):
@@ -94,18 +88,28 @@ def get_exception_action_classes():
 def dcc_exception_triggered(*args, **kwargs):
     exception_triggered(*args, **kwargs)
 
+    # call original DCC exception hook
     if hook_cls.previous_dcc_except_hook:
-        hook_cls.previous_dcc_except_hook(*args, **kwargs)
+        return hook_cls.previous_dcc_except_hook(*args, **kwargs)
+
+
+def normal_exception_triggered(*args, **kwargs):
+    exception_triggered(*args, **kwargs)
+
+    # call original exception hook
+    if hook_cls.previous_except_hook:
+        return hook_cls.previous_except_hook(*args, **kwargs)
 
 
 def register_exception_hook():
-    if sys.excepthook == exception_triggered:
+    if sys.excepthook == normal_exception_triggered:
+        print("Exception hook(s) already registered: {} - {}".format(__file__, normal_exception_triggered.__name__))
         return
 
     hook_cls.previous_except_hook = sys.excepthook
     hook_cls.previous_dcc_except_hook = dcc.register_exception_hook(dcc_exception_triggered)
-    sys.excepthook = exception_triggered
-    print("Registered Exception hook: {} - {}".format(__file__, exception_triggered.__name__))
+    sys.excepthook = normal_exception_triggered
+    print("Registered Exception hook(s): {} - {}".format(__file__, normal_exception_triggered.__name__))
 
 
 def unregister_exception_hook():
@@ -113,7 +117,7 @@ def unregister_exception_hook():
         sys.excepthook = hook_cls.previous_except_hook
     if hook_cls.previous_dcc_except_hook:
         dcc.unregister_exception_hook(hook_cls.previous_dcc_except_hook)
-    print("Unregistered Exception hook")
+    print("Unregistered Exception hook(s)")
 
 
 def test_exception():
