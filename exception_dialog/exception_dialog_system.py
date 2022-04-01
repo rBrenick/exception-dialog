@@ -9,6 +9,10 @@ if active_dcc_is_maya:
     from . import exception_dialog_dcc_maya as dcc_module
 
     dcc = dcc_module.ExceptionDialogMaya()
+else:
+    from . import exception_dialog_dcc_core as dcc_module
+
+    dcc = dcc_module.ExceptionDialogCoreInterface()
 
 
 class SessionInfo:

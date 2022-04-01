@@ -1,10 +1,9 @@
 class ExceptionDialogCoreInterface(object):
-    def get_base_except_hook(self):
+    def register_exception_hook(self, hook_func):
+        print("method 'register_exception_hook' is undefined for {}".format(self.__class__.__name__))
         return None
 
-    def register_exception_hook(self):
-        return None
-
-    def unregister_exception_hook(self, hook):
+    def unregister_exception_hook(self, previous_hook):
+        print("method 'unregister_exception_hook' is undefined for {}".format(self.__class__.__name__))
         return None
 
