@@ -110,6 +110,10 @@ def register_exception_hook():
         print("Exception hook(s) already registered: {} - {}".format(__file__, normal_exception_triggered.__name__))
         return
 
+    if not dcc.ui_available():
+        print("Exception hook(s) did not register, due to UI not being available.")
+        return
+
     hook_cls.previous_except_hook = sys.excepthook
     hook_cls.previous_dcc_except_hook = dcc.register_exception_hook(dcc_exception_triggered)
     sys.excepthook = normal_exception_triggered

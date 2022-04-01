@@ -1,4 +1,7 @@
 class ExceptionDialogCoreInterface(object):
+    def ui_available(self):
+        return False
+
     def register_exception_hook(self, hook_func):
         print("method 'register_exception_hook' is undefined for {}".format(self.__class__.__name__))
         return None
