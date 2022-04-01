@@ -141,9 +141,13 @@ def test_exception():
 
 def import_extensions(refresh=False):
     if refresh:
+        modules_to_pop = []
         for mod_key in sys.modules.keys():
             if mod_key.startswith(lk.extension_file_prefix):
-                sys.modules.pop(mod_key)
+                modules_to_pop.append(mod_key)
+
+        for mod_key in modules_to_pop:
+            sys.modules.pop(mod_key)
 
     # look through sys.path for extension modules
     modules_to_import = list()
