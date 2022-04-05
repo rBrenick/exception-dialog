@@ -106,7 +106,10 @@ class ExceptionDialogWindow(ui_utils.CoreToolWindow):
 
     def copy_exception_to_clipboard(self):
         clipboard = QtWidgets.QApplication.clipboard()  # type: QtGui.QClipboard
-        clipboard.setText(self.ui.exception_text_edit.toPlainText())
+
+        # wrap with ` symbol so it looks like a code formatted string in slack
+        exception_text = "```{}```".format(self.ui.exception_text_edit.toPlainText())
+        clipboard.setText(exception_text)
 
         # select text to indicate something happened
         self.ui.exception_text_edit.selectAll()
