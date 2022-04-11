@@ -95,7 +95,9 @@ class ExceptionDialogWindow(ui_utils.CoreToolWindow):
     def set_latest_exception(self, exc_type, exc_value, exc_trace):
         self._latest_exc_info = (exc_type, exc_value, exc_trace)
 
-        full_exception_info = traceback.format_exception(exc_type, exc_value, exc_trace)
+        full_exception_info = list()
+        full_exception_info.append("--- Exception at: {}\n".format(time.strftime("%H:%M:%S", time.localtime())))
+        full_exception_info.extend(traceback.format_exception(exc_type, exc_value, exc_trace))
         full_exception_info.append("-" * 50)
         full_exception_info.append("\n")
         exc_text = "".join(full_exception_info)
