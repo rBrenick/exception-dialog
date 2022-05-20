@@ -45,3 +45,7 @@ class SlackExceptionAction(eds.BaseExceptionAction):
     def trigger_action(exc_trace, exc_value, exc_typ):
         print("Trigger something in slack")
 </pre>
+
+Subclasses of BaseExceptionAction are automatically added to the dialog if <code>show_button</code> is set to True.
+
+They can also be triggerd from the exception by setting <code>is_automatic</code> to True.
