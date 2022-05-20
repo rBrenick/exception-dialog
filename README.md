@@ -48,4 +48,4 @@ class SlackExceptionAction(eds.BaseExceptionAction):
 
 Subclasses of BaseExceptionAction are automatically added to the dialog if <code>show_button</code> is set to True.
 
-They can also be triggerd from the exception by setting <code>is_automatic</code> to True.
+They can also be triggered from the exception by setting <code>is_automatic</code> to True.
