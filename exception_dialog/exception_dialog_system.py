@@ -63,12 +63,12 @@ def exception_triggered(exc_type=None, exc_value=None, exc_trace=None, *args, **
 
 class BaseExceptionAction(object):
     label = "[EXAMPLE]"
-    icon_name = "slack_icon"
+    icon_name = "default_icon"
     is_automatic = False
     show_button = True
 
     @staticmethod
-    def trigger_action(exc_trace, exc_value, exc_typ):
+    def trigger_action(exc_type, exc_value, exc_trace):
         logging.warning("trigger_action needs implementation for this class")
 
 
@@ -76,7 +76,7 @@ class AutomaticExceptionAction(BaseExceptionAction):
     is_automatic = True
 
     @staticmethod
-    def trigger_action(exc_trace, exc_value, exc_typ):
+    def trigger_action(exc_type, exc_value, exc_trace):
         pass
 
 
