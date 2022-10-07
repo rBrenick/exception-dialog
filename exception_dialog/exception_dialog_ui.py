@@ -36,6 +36,7 @@ class ExceptionDialogWindow(ui_utils.CoreToolWindow):
                 sub_cls.label,
                 icon=resources.get_image_path(sub_cls.icon_name),
                 command=partial(self.trigger_exception_class, sub_cls),
+                tool_tip=sub_cls.tool_tip,
             )
 
         self.add_action_button(
@@ -76,7 +77,7 @@ class ExceptionDialogWindow(ui_utils.CoreToolWindow):
 
         self.setMenuBar(menu_bar)
 
-    def add_action_button(self, label="[EXAMPLE]", icon=None, command=None):
+    def add_action_button(self, label="[EXAMPLE]", icon=None, command=None, tool_tip=""):
         btn = QtWidgets.QPushButton(label)
         btn.setMinimumHeight(40)
 
@@ -85,6 +86,9 @@ class ExceptionDialogWindow(ui_utils.CoreToolWindow):
 
         if command:
             btn.clicked.connect(command)
+
+        if tool_tip:
+            btn.setToolTip(tool_tip)
 
         self.ui.action_buttons_layout.addWidget(btn)
 

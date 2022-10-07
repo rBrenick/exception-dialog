@@ -66,6 +66,7 @@ class BaseExceptionAction(object):
     icon_name = "default_icon"
     is_automatic = False
     show_button = True
+    tool_tip = ""
 
     @staticmethod
     def trigger_action(exc_type, exc_value, exc_trace):
