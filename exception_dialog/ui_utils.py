@@ -2,9 +2,20 @@ import os
 import sys
 from functools import partial
 
-from PySide2 import QtCore, QtGui
-from PySide2 import QtWidgets
-from shiboken2 import wrapInstance
+try:  # Qt6 / PySide6 (Maya 2025 and newer)
+    from PySide6 import QtCore, QtGui
+    from PySide6 import QtWidgets
+    from PySide6.QtGui import QAction, QActionGroup
+    from shiboken6 import wrapInstance
+
+    QT_BINDING = "PySide6"
+except ImportError:  # Qt5 / PySide2 (Maya 2024 and older)
+    from PySide2 import QtCore, QtGui
+    from PySide2 import QtWidgets
+    from PySide2.QtWidgets import QAction, QActionGroup
+    from shiboken2 import wrapInstance
+
+    QT_BINDING = "PySide2"
 
 if sys.version_info.major >= 3:
     long = int
@@ -162,9 +173,9 @@ def build_menu_from_action_list(actions, menu=None, is_sub_menu=False):
                 if not item_to_check:
                     item_to_check = default_choice
 
-                grp = QtWidgets.QActionGroup(menu)
+                grp = QActionGroup(menu)
                 for choice_key in choices:
-                    action = QtWidgets.QAction(choice_key, menu)
+                    action = QAction(choice_key, menu)
                     action.setCheckable(True)
 
                     if choice_key == item_to_check:
